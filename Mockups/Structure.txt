@@ -1,0 +1,19 @@
+Pages
+
+	Login
+
+	Main Page
+		- Watchlist
+		- Filmes
+		- Séries
+
+	Filmes // Series
+		- Lista Filmes
+
+	Filme// Serie
+		- Informação sobre filme//serie
+	
+	Settings
+		icon na main page ou Sidebar
+
+		
