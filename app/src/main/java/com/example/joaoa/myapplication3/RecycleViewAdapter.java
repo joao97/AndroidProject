@@ -13,8 +13,12 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
 import android.widget.TextView;
+
+import com.squareup.picasso.Picasso;
 
 import java.io.InputStream;
 import java.util.List;
@@ -23,6 +27,7 @@ public class RecycleViewAdapter extends RecyclerView.Adapter<RecycleViewAdapter.
 
     private Context mContext;
     private List<Movie> mData;
+    private int lastPosition = -1;
 
     public RecycleViewAdapter(Context mContext, List<Movie> mData) {
         this.mContext = mContext;
@@ -42,7 +47,8 @@ public class RecycleViewAdapter extends RecyclerView.Adapter<RecycleViewAdapter.
     @Override
     public void onBindViewHolder(@NonNull MyViewHolder holder, int position) {
         holder.tv_movie_title.setText(mData.get(position).getTitle());
-        new DownloadImageTask(holder.img_movie_poster).execute(mData.get(position).getPoster());
+        Picasso.get().load(""+mData.get(position).getPoster()).resize(240, 360).centerCrop().into(holder.img_movie_poster);
+        setAnimation(holder.itemView, position);
 
 
     }
@@ -89,5 +95,16 @@ public class RecycleViewAdapter extends RecyclerView.Adapter<RecycleViewAdapter.
         }
     }
 
+
+    private void setAnimation(View viewToAnimate, int position)
+    {
+        // If the bound view wasn't previously displayed on screen, it's animated
+        if (position > lastPosition)
+        {
+            Animation animation = AnimationUtils.loadAnimation(mContext, android.R.anim.slide_in_left);
+            viewToAnimate.startAnimation(animation);
+            lastPosition = position;
+        }
+    }
 
 }

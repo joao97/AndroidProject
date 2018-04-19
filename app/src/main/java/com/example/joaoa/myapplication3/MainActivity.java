@@ -48,7 +48,6 @@ public class MainActivity extends AppCompatActivity {
     RecyclerView myrv;
     RecycleViewAdapter myAdapter;
     Context present=this;
-    OrientationEventListener mOrientationListener;
     MainActivity activity;
 
 
@@ -70,36 +69,28 @@ public class MainActivity extends AppCompatActivity {
         myrv=(RecyclerView) findViewById(R.id.recyclerView);
 
 
+
+
     }
 
 
 
 
     @Override
-    public void onConfigurationChanged(Configuration newConfig) {
+    public void onConfigurationChanged(Configuration newConfig)
+    {
         Log.d("tag", "config changed");
         super.onConfigurationChanged(newConfig);
 
-        final Toast toast;
+        // Checks the orientation of the screen
+        if (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            Toast.makeText(this, "landscape", Toast.LENGTH_SHORT).show();
+            myrv.setLayoutManager(new GridLayoutManager(present,4));
+        } else if (newConfig.orientation == Configuration.ORIENTATION_PORTRAIT){
+            Toast.makeText(this, "portrait", Toast.LENGTH_SHORT).show();
+            myrv.setLayoutManager(new GridLayoutManager(present,2));
+        }
 
-        int orientation = newConfig.orientation;
-        toast = Toast.makeText(activity, ""+orientation, Toast.LENGTH_LONG);
-       /* if (orientation == Configuration.ORIENTATION_PORTRAIT)
-            toast = Toast.makeText(activity, "Vertical", Toast.LENGTH_LONG);
-        else if (orientation == Configuration.ORIENTATION_LANDSCAPE)
-            toast = Toast.makeText(activity, "Horizontal", Toast.LENGTH_LONG);
-        else
-            toast = Toast.makeText(activity, "Example Toast", Toast.LENGTH_LONG);
-*/
-        toast.show();
-
-        new Handler().postDelayed(new Runnable() {
-
-            @Override
-            public void run() {
-                toast.cancel();
-            }
-        }, 1000);
     }
 
     protected void onUpdate(Bundle savedInstanceState) {
@@ -108,14 +99,7 @@ public class MainActivity extends AppCompatActivity {
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
                 WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
-        setContentView(R.layout.activity_main);
-
-        lstMovie=new ArrayList<>();
-
         new DataLoader().execute();
-
-
-        myrv=(RecyclerView) findViewById(R.id.recyclerView);
 
     }
 
@@ -156,46 +140,52 @@ public class MainActivity extends AppCompatActivity {
 
         protected void onPostExecute(String response) {
             if(response == null) {
-                response = "THERE WAS AN ERROR";
-            }
+                Toast.makeText(present, "NO INTERNET CONNECTION", Toast.LENGTH_LONG).show();
+            }else{
+                try {
+                    JSONObject result =  (JSONObject) new JSONTokener(response).nextValue();
+                    JSONArray list=result.getJSONArray("results");
+
+                    for (int i=0; i<list.length();i++){
+
+                        String url=list.getJSONObject(i).getString("poster_path");
+                        if(url!=null){
+                            String poster_url = "http://image.tmdb.org/t/p/w185/"+url;
+                            int id=list.getJSONObject(i).getInt("id");
+                            String title=list.getJSONObject(i).getString("title");
+                            String description=list.getJSONObject(i).getString("overview");
+                            List<Integer> categories=new ArrayList<>();
+                            JSONArray genders=list.getJSONObject(i).getJSONArray("genre_ids");
+                            Log.d("v","array - "+genders);
+                            for (int w=0; w<genders.length();w++){
+                                categories.add(genders.getInt(w));
+                            }
+                            if(true){
+                                lstMovie.add(new Movie(id,title,categories,description,poster_url));
 
 
-            try {
-                JSONObject result =  (JSONObject) new JSONTokener(response).nextValue();
-                JSONArray list=result.getJSONArray("results");
+                            }
 
-                for (int i=0; i<list.length();i++){
-
-                    String url=list.getJSONObject(i).getString("poster_path");
-                    if(url!=null){
-                        String poster_url = "http://image.tmdb.org/t/p/w185/"+url;
-                        int id=list.getJSONObject(i).getInt("id");
-                        String title=list.getJSONObject(i).getString("title");
-                        String description=list.getJSONObject(i).getString("overview");
-                        List<Integer> categories=new ArrayList<>();
-                        JSONArray genders=list.getJSONObject(i).getJSONArray("genre_ids");
-                        Log.d("v","array - "+genders);
-                        for (int w=0; w<genders.length();w++){
-                            categories.add(genders.getInt(w));
                         }
 
-                        lstMovie.add(new Movie(id,title,categories,description,poster_url));
+
 
                     }
+                    myAdapter = new RecycleViewAdapter(present,lstMovie);
+                    myrv.setLayoutManager(new GridLayoutManager(present,2));
+                    myrv.setAdapter(myAdapter);
 
 
 
+                } catch (JSONException e) {
+                    e.printStackTrace();
                 }
-                myAdapter = new RecycleViewAdapter(present,lstMovie);
-                myrv.setLayoutManager(new GridLayoutManager(present,3));
-                myrv.setItemAnimator(new DefaultItemAnimator());
-                myrv.setAdapter(myAdapter);
-
-
-
-            } catch (JSONException e) {
-                e.printStackTrace();
             }
+
+
+
+
+
 
 
 
