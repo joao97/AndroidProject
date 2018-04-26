@@ -15,17 +15,31 @@
         <android.support.v7.widget.RecyclerView
             android:id="@+id/recyclerView"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:overScrollMode="never">
         </android.support.v7.widget.RecyclerView>
 
     </FrameLayout>
-    <ListView android:id="@+id/left_drawer"
-        android:layout_width="240dp"
+    <android.support.design.widget.NavigationView
+        android:id="@+id/sideBar"
+        android:layout_width="300dp"
         android:layout_height="match_parent"
         android:layout_gravity="start"
         android:choiceMode="singleChoice"
         android:divider="@android:color/transparent"
         android:dividerHeight="0dp"
-        android:background="#111"/>
+        android:background="#111">
+
+        <include
+            android:id="@+id/tool_bar"
+            layout="@layout/sidebar_header">
+        </include>
+        <android.support.v7.widget.RecyclerView
+            android:layout_width="match_parent"
+            android:overScrollMode="never"
+            android:layout_height="wrap_content">
+        </android.support.v7.widget.RecyclerView>
+
+    </android.support.design.widget.NavigationView>
 
 </android.support.v4.widget.DrawerLayout>

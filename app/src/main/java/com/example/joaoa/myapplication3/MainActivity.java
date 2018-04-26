@@ -4,6 +4,7 @@ import android.app.ActionBar;
 import android.app.Activity;
 import android.content.Context;
 import android.content.res.Configuration;
+import android.graphics.BitmapFactory;
 import android.hardware.SensorManager;
 import android.media.Image;
 import android.os.AsyncTask;
@@ -41,6 +42,8 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
+import jp.wasabeef.blurry.Blurry;
+
 public class MainActivity extends AppCompatActivity {
 
 
@@ -59,6 +62,17 @@ public class MainActivity extends AppCompatActivity {
                 WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
         setContentView(R.layout.activity_main);
+
+
+        Blurry.with(this)
+                .radius(10)
+                .sampling(4)
+                .async()
+                .from(BitmapFactory.decodeResource(this.getResources(),
+                R.drawable.popcorn)).into((ImageView) findViewById(R.id.headerBack));
+
+
+
 
         lstMovie=new ArrayList<>();
 
